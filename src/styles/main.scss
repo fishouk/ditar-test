@@ -1,0 +1,9 @@
+@import "bootstrap/scss/functions"; 
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+@import "~bootstrap/scss/bootstrap";
+
+@import "./ui-elements/buttons.scss";
+
+@import "../views/layout.scss";
+@import "../views/pages/uplaodImages/styles.scss";

@@ -2,7 +2,7 @@ import React from 'react';
 
 const Layout =({children}) =>{
     return(
-        <main>{children}</main>
+      <div className="main-wrapper bg-light">{children}</div>
     )
 }
 

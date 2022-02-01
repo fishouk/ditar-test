@@ -5,6 +5,7 @@ import { CloudUpload } from 'react-bootstrap-icons';
 function UploadImagesPage() {
   const [fileArr, setFileArr] = useState([]);
   const [previewArr, setPreviewArr] = useState([]);
+  const [inDropZoneUploadImages, setInDropZoneUploadImages] = useState(false);
 
   /**
    * 
@@ -36,12 +37,13 @@ function UploadImagesPage() {
 
   /**
    * 
-   * Загрузка изображений drag & drop - при бросании файлов
+   * Загрузка изображений drag & drop - файлы сброшены
    */
   const handleDropUploadFile = (e) => {
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
+    e.stopPropagation();
     uploadMultipleFiles(e.dataTransfer.files);
+    setInDropZoneUploadImages(false);
   }
   /**
    * 
@@ -49,13 +51,27 @@ function UploadImagesPage() {
    */
   const handleDragEnterUploadFile = (e) => {
     e.preventDefault();
+    e.stopPropagation();
+    setInDropZoneUploadImages(true);
+  }
+   /**
+   * 
+   * Загрузка изображений drag & drop - файлы двигается в зоне бросания
+   */
+  const handleDragOverUploadFile = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = 'move';
+    setInDropZoneUploadImages(true);
   }
   /**
    * 
    * Загрузка изображений drag & drop - файлы вне зоны бросания
    */
-  const handleDragOverUploadFile = (e) => {
+  const handleDragLeaveUploadFile = (e) => {
     e.preventDefault();
+    e.stopPropagation();
+    setInDropZoneUploadImages(false);
   }
 
    /**
@@ -88,12 +104,19 @@ function UploadImagesPage() {
                       className="file-upload-wrapper"       
                       onDrop={e => handleDropUploadFile(e)}
                       onDragOver={e => handleDragOverUploadFile(e)}
+                      onDragLeave={e => handleDragLeaveUploadFile(e)}
                       onDragEnter={e => handleDragEnterUploadFile(e)}
                     > <div className="file-upload">
                         <div className="file-upload-content">
                           <div className="file-upload-content__wrapper">
-                            <div className="file-upload-content__icon"><CloudUpload /></div>
-                            <p className="file-upload-content__title">Перетащите сюда файлы или щелкните для выбора.</p>
+                            {inDropZoneUploadImages ? (
+                              <p className="file-upload-content__title">Бросайте.</p>
+                            ) : (
+                              <>
+                                <div className="file-upload-content__icon"><CloudUpload /></div>
+                                <p className="file-upload-content__title">Перетащите сюда файлы или щелкните для выбора.</p>
+                              </>
+                            )}
                           </div>
                         </div>
                         <Form.Control type="file" className="file-upload__input" onChange={e => handleUploadMultipleFilesInput(e)} accept="image/*" multiple />

@@ -10,8 +10,8 @@ function UploadImagesPage() {
    * 
    * Создание превью и записи файлов в стейт
    */
-  const uploadMultipleFiles = (e) => {
-    const uploadedFiles = e.target.files;
+  const uploadMultipleFiles = (arr = []) => {
+    const uploadedFiles = arr;
 
     console.log(uploadedFiles);
     if (uploadedFiles && uploadedFiles.length > 0) {
@@ -27,13 +27,45 @@ function UploadImagesPage() {
 
   /**
    * 
+   * Загрузка изображений при нажатии на инпут
+   */
+   const handleUploadMultipleFilesInput = (e) => {
+    e.preventDefault();
+    uploadMultipleFiles(e.target.files);
+  }
+
+  /**
+   * 
+   * Загрузка изображений drag & drop - при бросании файлов
+   */
+  const handleDropUploadFile = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    uploadMultipleFiles(e.dataTransfer.files);
+  }
+  /**
+   * 
+   * Загрузка изображений drag & drop - файлы в зоне бросания
+   */
+  const handleDragEnterUploadFile = (e) => {
+    e.preventDefault();
+  }
+  /**
+   * 
+   * Загрузка изображений drag & drop - файлы вне зоны бросания
+   */
+  const handleDragOverUploadFile = (e) => {
+    e.preventDefault();
+  }
+
+   /**
+   * 
    * Отправка файлов по апи
    */
-  const uploadFiles = (e) => {
+    const uploadFiles = (e) => {
       e.preventDefault();
       console.log(previewArr);
   }
-
     // console.log(fileArr);
     // console.log(previewArr);
 
@@ -52,20 +84,19 @@ function UploadImagesPage() {
                 <Card.Subtitle className="text-muted mb-1">Загрузка фото</Card.Subtitle>
                 <Form>
                   <Form.Group className="mb-4" controlId="formBasicPassword">
-                    <FormLabel className="file-upload-wrapper">
-                      <div className={`file-preview ${previewArr.length <= 0 && "file-preview--hidden"}`}>
-                        {previewArr.length > 0 && previewArr.map( (preview, index) => 
-                          <img src={preview} className="file-preview__item" key={index} />
-                        )}
-                      </div>
-                      <div className={`file-upload ${previewArr.length > 0 && "file-upload--hidden"}`}>
+                    <FormLabel 
+                      className="file-upload-wrapper"       
+                      onDrop={e => handleDropUploadFile(e)}
+                      onDragOver={e => handleDragOverUploadFile(e)}
+                      onDragEnter={e => handleDragEnterUploadFile(e)}
+                    > <div className="file-upload">
                         <div className="file-upload-content">
                           <div className="file-upload-content__wrapper">
                             <div className="file-upload-content__icon"><CloudUpload /></div>
                             <p className="file-upload-content__title">Перетащите сюда файлы или щелкните для выбора.</p>
                           </div>
                         </div>
-                        <Form.Control type="file" className="file-upload__input" onChange={uploadMultipleFiles} accept="image/*" multiple />
+                        <Form.Control type="file" className="file-upload__input" onChange={e => handleUploadMultipleFilesInput(e)} accept="image/*" multiple />
                       </div>
                     </FormLabel>
                   </Form.Group>
@@ -83,7 +114,12 @@ function UploadImagesPage() {
           <Col>
             <Card>
                 <Card.Body>
-                  <Card.Subtitle className="text-muted">Зона сортировки миниатюр</Card.Subtitle>
+                  <Card.Subtitle className="text-muted mb-4">Зона сортировки миниатюр</Card.Subtitle>
+                    <div className={`file-preview ${previewArr.length <= 0 && "file-preview--hidden"}`}>
+                      {previewArr.length > 0 && previewArr.map( (preview, index) => 
+                        <img src={preview} className="file-preview__item" key={index} />
+                      )}
+                    </div>
                 </Card.Body>
             </Card>
           </Col>

@@ -1,4 +1,10 @@
 .btn-purple {
   background-color: $indigo-500;
   color: white;
+
+  &:hover,
+  &:focus {
+    background-color: $indigo-400;
+    color: white;
+  }
 }

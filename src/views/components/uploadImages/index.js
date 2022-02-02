@@ -1,31 +1,15 @@
 import React, {useState} from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { uploadImagesGenerateThumbnails } from './uploadImagesSlice';
+
 import { Form, FormLabel } from 'react-bootstrap';
 import { CloudUpload } from 'react-bootstrap-icons';
 import ThumbnailGallery from '../thumbnailGallery';
 
 function UploadImages({}) {
-  const [fileArr, setFileArr] = useState([]);
-  const [previewArr, setPreviewArr] = useState([]);
   const [inDropZoneUploadImages, setInDropZoneUploadImages] = useState(false);
-
-  /**
-   * 
-   * Создание превью и записи файлов в стейт
-   */
-   const uploadMultipleFiles = (arr = []) => {
-    const uploadedFiles = arr;
-
-    console.log(uploadedFiles);
-    if (uploadedFiles && uploadedFiles.length > 0) {
-      setFileArr(uploadedFiles);
-      
-      const previewsForUploadFiles = [];
-      for (let i = 0; i < uploadedFiles.length; i++) {
-        previewsForUploadFiles.push(URL.createObjectURL(uploadedFiles[i]));
-      }
-      setPreviewArr(previewsForUploadFiles);
-    }
-  }
+  const previewArr = useSelector((state) => state.uploadImages.previewArr);
+  const dispatch = useDispatch();
 
   /**
    * 
@@ -33,7 +17,7 @@ function UploadImages({}) {
    */
    const handleUploadMultipleFilesInput = (e) => {
     e.preventDefault();
-    uploadMultipleFiles(e.target.files);
+    dispatch(uploadImagesGenerateThumbnails(e.target.files || []));
   }
 
   /**
@@ -43,7 +27,7 @@ function UploadImages({}) {
   const handleDropUploadFile = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    uploadMultipleFiles(e.dataTransfer.files);
+    dispatch(uploadImagesGenerateThumbnails(e.dataTransfer.files || []));
     setInDropZoneUploadImages(false);
   }
   /**

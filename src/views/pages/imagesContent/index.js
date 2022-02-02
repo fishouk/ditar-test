@@ -1,9 +1,13 @@
 import React, {useState} from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
+import ThumbnailGallery from '../../components/thumbnailGallery';
 import UploadImages from '../../components/uploadImages';
 
 function ImagesContent() {
-  const [fileArr, setFileArr] = useState([]);
+  const fileArr = useSelector((state) => state.uploadImages.fileArr);
+  // const previewArr = useSelector([(state) => state.uploadImages.previewArr]);
+  const dispatch = useDispatch();
 
    /**
    * 
@@ -46,6 +50,7 @@ function ImagesContent() {
             <Card>
                 <Card.Body>
                   <Card.Subtitle className="text-muted mb-4">Зона сортировки миниатюр</Card.Subtitle>
+                  {/* <ThumbnailGallery thumbnails={previewArr} /> */}
                 </Card.Body>
             </Card>
           </Col>

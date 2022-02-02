@@ -3,7 +3,6 @@ import { createSlice } from '@reduxjs/toolkit';
 export const uploadImagesHelper = createSlice({
   name: 'uploadImages',
   initialState: {
-    fileArr: [],
     previewArr: [],
   },
   reducers: {
@@ -15,8 +14,6 @@ export const uploadImagesHelper = createSlice({
       const uploadedFiles = action.payload;
 
       if (uploadedFiles && uploadedFiles.length > 0) {
-        state.fileArr = uploadedFiles;
-        
         const previewsForUploadFiles = [];
         for (let i = 0; i < uploadedFiles.length; i++) {
           previewsForUploadFiles.push(URL.createObjectURL(uploadedFiles[i]));

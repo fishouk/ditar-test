@@ -6,7 +6,7 @@ import { Form, FormLabel } from 'react-bootstrap';
 import { CloudUpload } from 'react-bootstrap-icons';
 import ThumbnailGallery from '../thumbnailGallery';
 
-function UploadImages({}) {
+function UploadImages({register}) {
   const [inDropZoneUploadImages, setInDropZoneUploadImages] = useState(false);
   const previewArr = useSelector((state) => state.uploadImages.previewArr);
   const dispatch = useDispatch();
@@ -81,7 +81,7 @@ function UploadImages({}) {
             )}
           </div>
         </div>
-        <Form.Control type="file" className="file-upload__input" onChange={e => handleUploadMultipleFilesInput(e)} accept="image/*" multiple />
+        <Form.Control type="file" className="file-upload__input" {...register("uploadImagesInput")} onChange={e => handleUploadMultipleFilesInput(e)} accept="image/*" multiple />
       </div>
     </FormLabel>
   )

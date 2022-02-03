@@ -139,7 +139,6 @@ export const { apiFailure, setAuthTokens, setUploadedFilesIdArr, setClearUploade
  */
  export const fetchThumbnails = (Ids, accessToken) => {
   return async dispatch => {
-    let promiseArray = [];
     for (let i = 0; i < Ids.length; i++ ) {
       dispatch(setThumbnailsById({id: Ids[i], thumbnail: "", loading: true}));
       fetchThumbnail(Ids[i], accessToken).then(response => dispatch(setThumbnailsById({id: Ids[i], thumbnail: response, loading: false})));

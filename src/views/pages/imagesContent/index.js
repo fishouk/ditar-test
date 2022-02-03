@@ -10,7 +10,6 @@ import { useForm } from "react-hook-form";
 function ImagesContent() {
   const accessToken = useSelector((state) => state.imagesContent.accessToken);
   const uploadedFilesIdArr = useSelector((state) => state.imagesContent.uploadedFilesIdArr);
-  const thumbnails = useSelector((state) => state.imagesContent.thumbnails);
   
   // const previewArr = useSelector([(state) => state.uploadImages.previewArr]);
   const dispatch = useDispatch();
@@ -18,13 +17,13 @@ function ImagesContent() {
 
   useEffect((()=>{
     dispatch(fetchAuth());
-  }), []);
+  }), [dispatch]);
 
   useEffect((()=>{
     if (accessToken && accessToken.length > 0) {
       dispatch(fetchThumbnails(uploadedFilesIdArr, accessToken));
     }
-  }), [uploadedFilesIdArr]);
+  }), [dispatch, accessToken, uploadedFilesIdArr]);
 
   /**
    * 
@@ -86,7 +85,7 @@ function ImagesContent() {
             <Card>
                 <Card.Body>
                   <Card.Subtitle className="text-muted mb-4">Зона сортировки миниатюр</Card.Subtitle>
-                  <SortedThumbnailGallery thumbnails={thumbnails} handleDeleteImageById={handleDeleteImageById} />
+                  <SortedThumbnailGallery handleDeleteImageById={handleDeleteImageById} />
                 </Card.Body>
             </Card>
           </Col>

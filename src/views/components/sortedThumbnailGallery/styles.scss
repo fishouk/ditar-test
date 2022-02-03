@@ -1,0 +1,10 @@
+.sorted-thumbnails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+
+  &__item {
+    width: 100px;
+    height: 100%;
+  }
+}

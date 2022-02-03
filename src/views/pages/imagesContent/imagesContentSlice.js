@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 const API = "https://168.119.229.42.sslip.io";
 
@@ -7,6 +8,8 @@ export const imagesContentHelper = createSlice({
   initialState: {
     accessToken: "",
     refreshToken: "",
+    uploadedFilesIdArr: [],
+    thumbnails: [],
     error: {},
   },
   reducers: {
@@ -25,10 +28,39 @@ export const imagesContentHelper = createSlice({
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
     },
+    /**
+     * 
+     * Запись id загруженных изображений
+     */
+     setUploadedFilesIdArr: (state, action) => {
+      state.uploadedFilesIdArr = [...state.uploadedFilesIdArr, ...action.payload];
+    },
+    /**
+     * 
+     * Запись изображений полученных по апи по Id
+     */
+    setThumbnailsById: (state, action) => {
+      const existedThumnails = JSON.parse(JSON.stringify(state.thumbnails));
+
+      const existedThumbnailId = existedThumnails.findIndex((item => item.id === action.payload.id));
+      if (existedThumbnailId >= 0) {
+        state.thumbnails[existedThumbnailId].thumbnail = action.payload.thumbnail;
+        state.thumbnails[existedThumbnailId].loading = action.payload.loading;
+        return;
+      }
+
+      const thumbnail= {
+        id: action.payload.id,
+        thumbnail: action.payload.thumbnail,
+        loading: action.payload.loading,
+      };
+    
+      state.thumbnails = [...state.thumbnails, thumbnail];
+    },
   },
 })
 
-export const { apiFailure, setAuthTokens } = imagesContentHelper.actions;
+export const { apiFailure, setAuthTokens, setUploadedFilesIdArr, setThumbnailsById } = imagesContentHelper.actions;
 
 
 /**
@@ -37,24 +69,87 @@ export const { apiFailure, setAuthTokens } = imagesContentHelper.actions;
  */
  export const fetchAuth = () => {
   return async dispatch => {
-    try {
-      const response = await fetch(`${API}/v1/auth/login`, {
-        method: 'POST',
-        cache: 'no-cache',
-        headers: {  
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: "test@168.119.229.42.sslip.io", password: "password" }),
-      });
+    return new Promise((resolve, reject) => {
+      axios({
+        method: "post",
+        url: `${API}/v1/auth/login`,
+        data: JSON.stringify({ email: "test@168.119.229.42.sslip.io", password: "password" }),
+        headers: { 'Content-Type': 'application/json', },
+      })
+      .then(response => response.data)
+      .then(data=>resolve(dispatch(setAuthTokens(data))))
+      .catch(error => dispatch(apiFailure(reject(error))));
+    });
+  }
+}
+
+/**
+ * 
+ * Запрос для загрузки изображений
+ */
+ export const fetchUploadImages = (images, accessToken) => {
+  return async dispatch => {
+    let promiseArray = [];
+    for (let i = 0; i < images.length; i++ ) {
+      promiseArray.push(fetchUploadImage(images[i], accessToken));
+    }
+    Promise.all(promiseArray)
+            .then(values => dispatch(setUploadedFilesIdArr(values)));
+  }
+}
+
+/**
+ * 
+ * Запрос для загрузки изображения
+ */
+ export const fetchUploadImage = (image, accessToken) => {
+    return new Promise((resolve, reject) => {
+      const formData = new FormData();
+      formData.append("photo", image);
       
-      const data = await response.json();
-      dispatch(setAuthTokens(data))
-    } catch (error) {
-      console.log(error);
-      dispatch(apiFailure(error))
+      axios({
+        method: "post",
+        url: `${API}/v1/photos/upload`,
+        data: formData,
+        headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type':'multipart/form-data' },
+      })
+      .then(response => resolve(response.data[0].id))
+      .catch(error => reject(error));
+  });
+}
+
+/**
+ * 
+ * Запрос для получения изображений
+ */
+ export const fetchThumbnails = (Ids, accessToken) => {
+  return async dispatch => {
+    let promiseArray = [];
+    for (let i = 0; i < Ids.length; i++ ) {
+      dispatch(setThumbnailsById({id: Ids[i], thumbnail: "", loading: true}));
+      fetchThumbnail(Ids[i], accessToken).then(response => dispatch(setThumbnailsById({id: Ids[i], thumbnail: response, loading: false})));
     }
   }
+}
+
+/**
+ * 
+ * Запрос для получения изображения
+ */
+ export const fetchThumbnail = (id, accessToken) => {
+    return new Promise((resolve, reject) => {
+      axios.get(
+        `${API}/v1/photos/load-thumbnail/${id}`,
+        {
+          headers: {
+            'Authorization': 'Bearer ' + accessToken,
+          },
+          responseType: 'blob',
+        }
+      )
+      .then(response => resolve(URL.createObjectURL(new Blob([response.data]))))
+      .catch(error => reject(error));
+  });
 }
 
 export default imagesContentHelper.reducer;

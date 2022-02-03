@@ -8,9 +8,16 @@ export const uploadImagesHelper = createSlice({
   reducers: {
     /**
      * 
+     * Очистка превью
+     */
+     clearUploadImagesThumbnails: (state) => {
+      state.previewArr = [];
+    },
+    /**
+     * 
      * Создание превью и записи файлов в стейт
      */
-    uploadImagesGenerateThumbnails: (state, action) => {
+     uploadImagesGenerateThumbnails: (state, action) => {
       const uploadedFiles = action.payload;
 
       if (uploadedFiles && uploadedFiles.length > 0) {
@@ -24,6 +31,6 @@ export const uploadImagesHelper = createSlice({
   },
 })
 
-export const { uploadImagesGenerateThumbnails } = uploadImagesHelper.actions;
+export const { uploadImagesGenerateThumbnails, clearUploadImagesThumbnails } = uploadImagesHelper.actions;
 
 export default uploadImagesHelper.reducer;

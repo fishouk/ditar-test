@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAuth, fetchUploadImages, fetchThumbnails} from './imagesContentSlice';
+import { fetchAuth, fetchUploadImages, fetchThumbnails, fetchDeleteThembnailById} from './imagesContentSlice';
 import { clearUploadImagesThumbnails } from '../../components/uploadImages/uploadImagesSlice';
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
 import SortedThumbnailGallery from '../../components/sortedThumbnailGallery';
@@ -44,6 +44,16 @@ function ImagesContent() {
     }
   }
 
+  /**
+   * 
+   * Удаление файла по айди
+   */
+  const handleDeleteImageById = (id) => {
+    if (accessToken && accessToken.length > 0 && id) {
+      dispatch(fetchDeleteThembnailById(id, accessToken));
+    }
+  }
+
   return (
     <div className="py-5">
       <Container>
@@ -76,7 +86,7 @@ function ImagesContent() {
             <Card>
                 <Card.Body>
                   <Card.Subtitle className="text-muted mb-4">Зона сортировки миниатюр</Card.Subtitle>
-                  <SortedThumbnailGallery thumbnails={thumbnails} />
+                  <SortedThumbnailGallery thumbnails={thumbnails} handleDeleteImageById={handleDeleteImageById} />
                 </Card.Body>
             </Card>
           </Col>

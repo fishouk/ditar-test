@@ -4,7 +4,22 @@
   gap: 20px;
 
   &__item {
-    width: 100px;
-    height: 100%;
+    position: relative;
+    padding-top: 16px;
+    padding-right: 16px;
+    width: 116px;
+    height: 116px;
+  }
+
+  &__item-delete {
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+  }
+
+  &__item-image {
+    width:100%;
+    height: auto;
   }
 }

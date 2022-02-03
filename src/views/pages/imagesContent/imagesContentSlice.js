@@ -37,6 +37,13 @@ export const imagesContentHelper = createSlice({
     },
     /**
      * 
+     * Сброс id загруженных изображений
+     */
+     setClearUploadedFilesIdArr: (state) => {
+      state.uploadedFilesIdArr = [];
+    },
+    /**
+     * 
      * Запись изображений полученных по апи по Id
      */
     setThumbnailsById: (state, action) => {
@@ -57,10 +64,17 @@ export const imagesContentHelper = createSlice({
     
       state.thumbnails = [...state.thumbnails, thumbnail];
     },
+    /**
+     * 
+     * Удаление изображения по апи по Id
+     */
+    deleteThembnailById: (state, action) => {
+      state.thumbnails = state.thumbnails.filter(item => item.id === action.payload ? false : item);
+    }
   },
 })
 
-export const { apiFailure, setAuthTokens, setUploadedFilesIdArr, setThumbnailsById } = imagesContentHelper.actions;
+export const { apiFailure, setAuthTokens, setUploadedFilesIdArr, setClearUploadedFilesIdArr, setThumbnailsById, deleteThembnailById } = imagesContentHelper.actions;
 
 
 /**
@@ -94,7 +108,8 @@ export const { apiFailure, setAuthTokens, setUploadedFilesIdArr, setThumbnailsBy
       promiseArray.push(fetchUploadImage(images[i], accessToken));
     }
     Promise.all(promiseArray)
-            .then(values => dispatch(setUploadedFilesIdArr(values)));
+            .then(values => dispatch(setUploadedFilesIdArr(values)))
+            .then(dispatch(setClearUploadedFilesIdArr()));
   }
 }
 
@@ -150,6 +165,27 @@ export const { apiFailure, setAuthTokens, setUploadedFilesIdArr, setThumbnailsBy
       .then(response => resolve(URL.createObjectURL(new Blob([response.data]))))
       .catch(error => reject(error));
   });
+}
+
+/**
+ * 
+ * Запрос для удаления изображения по Id
+ */
+export const fetchDeleteThembnailById = (id, accessToken) => {
+  return async dispatch => {
+    return new Promise((resolve, reject) => {
+      axios.get(
+        `${API}/v1/photos/delete/${id}`,
+        {
+          headers: {
+            'Authorization': 'Bearer ' + accessToken,
+          },
+        }
+      )
+      .then(response => resolve(dispatch(deleteThembnailById(id))))
+      .catch(error => reject(error));
+    })
+  }
 }
 
 export default imagesContentHelper.reducer;
